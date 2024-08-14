@@ -5,6 +5,8 @@ import ac.grim.grimac.api.AbstractCheck;
 import ac.grim.grimac.api.events.CommandExecuteEvent;
 import ac.grim.grimac.checks.Check;
 import ac.grim.grimac.events.packets.ProxyAlertMessenger;
+import ac.grim.grimac.mitigation.PlayerTrustFactor;
+import ac.grim.grimac.mitigation.TrustFactorCheckType;
 import ac.grim.grimac.player.GrimPlayer;
 import ac.grim.grimac.utils.anticheat.LogUtil;
 import ac.grim.grimac.utils.anticheat.MessageUtil;
@@ -111,7 +113,7 @@ public class PunishmentManager {
     }
 
     public boolean handleAlert(GrimPlayer player, String verbose, Check check) {
-        String alertString = GrimAPI.INSTANCE.getConfigManager().getConfig().getStringElse("alerts-format", "%prefix% &f%player% &bfailed &f%check_name% &f(x&c%vl%&f) &7%verbose%");
+        // GrimAPI.INSTANCE.getConfigManager().getConfig().getStringElse("alerts-format", "%prefix% &f%player% &bfailed &f%check_name% &f(x&c%vl%&f) &7%verbose%");
         boolean testMode = GrimAPI.INSTANCE.getConfigManager().getConfig().getBooleanElse("test-mode", false);
         boolean sentDebug = false;
 
@@ -120,19 +122,88 @@ public class PunishmentManager {
             if (group.getChecks().contains(check)) {
                 int violationCount = group.getViolations().size();
                 for (ParsedCommand command : group.getCommands()) {
-                    String cmd = replaceAlertPlaceholders(command.getCommand(), group, check, alertString, verbose);
-
                     // Verbose that prints all flags
-                    if (GrimAPI.INSTANCE.getAlertManager().getEnabledVerbose().size() > 0 && command.command.equals("[alert]")) {
+                    if (command.command.equals("[alert]")) {
                         sentDebug = true;
-                        for (Player bukkitPlayer : GrimAPI.INSTANCE.getAlertManager().getEnabledVerbose()) {
-                            bukkitPlayer.sendMessage(cmd);
+
+                        if (check.getTrustFactorType() == TrustFactorCheckType.COMBAT) {
+                            if (player.combatTrustFactor == PlayerTrustFactor.GREEN) {
+                                for (Player bukkitPlayer : GrimAPI.INSTANCE.getAlertManager().getEnabledVerbose()) {
+                                    String alertString = "&4[Acidity]: &f%player% failed %check_name% [" + "&2GREEN" + "&f] &f(x&c%vl%&f) &7%verbose%";
+                                    String cmd = replaceAlertPlaceholders(command.getCommand(), group, check, alertString, verbose);
+
+                                    bukkitPlayer.sendMessage(cmd);
+                                }
+                            }
+                            if (player.combatTrustFactor == PlayerTrustFactor.YELLOW) {
+                                for (Player bukkitPlayer : GrimAPI.INSTANCE.getAlertManager().getEnabledAlerts()) {
+                                    String alertString = "&4[Acidity]: &f%player% failed %check_name% [" + "&gYELLOW" + "&f] &f(x&c%vl%&f) &7%verbose%";
+                                    String cmd = replaceAlertPlaceholders(command.getCommand(), group, check, alertString, verbose);
+
+                                    bukkitPlayer.sendMessage(cmd);
+                                }
+                            }
+                            if (player.combatTrustFactor == PlayerTrustFactor.ORANGE) {
+                                for (Player bukkitPlayer : GrimAPI.INSTANCE.getAlertManager().getEnabledAlerts()) {
+                                    String alertString = "&4[Acidity]: &f%player% failed %check_name% [" + "&6ORANGE" + "&f] &f(x&c%vl%&f) &7%verbose%";
+                                    String cmd = replaceAlertPlaceholders(command.getCommand(), group, check, alertString, verbose);
+
+                                    bukkitPlayer.sendMessage(cmd);
+                                }
+                            }
+                            if (player.combatTrustFactor == PlayerTrustFactor.RED) {
+                                for (Player bukkitPlayer : GrimAPI.INSTANCE.getAlertManager().getEnabledAlerts()) {
+                                    String alertString = "&4[Acidity]: &f%player% failed %check_name% [" + "&4RED" + "&f] &f(x&c%vl%&f) &7%verbose%";
+                                    String cmd = replaceAlertPlaceholders(command.getCommand(), group, check, alertString, verbose);
+
+                                    bukkitPlayer.sendMessage(cmd);
+                                }
+                            }
                         }
-                        if (GrimAPI.INSTANCE.getConfigManager().getConfig().getBooleanElse("verbose.print-to-console", false)) {
-                            LogUtil.console(cmd); // Print verbose to console
+                        else if (check.getTrustFactorType() == TrustFactorCheckType.MOVEMENT) {
+                            if (player.movementTrustFactor == PlayerTrustFactor.GREEN) {
+                                for (Player bukkitPlayer : GrimAPI.INSTANCE.getAlertManager().getEnabledVerbose()) {
+                                    String alertString = "&4[Acidity]: &f%player% failed %check_name% [" + "&2GREEN" + "&f] &f(x&c%vl%&f) &7%verbose%";
+                                    String cmd = replaceAlertPlaceholders(command.getCommand(), group, check, alertString, verbose);
+
+                                    bukkitPlayer.sendMessage(cmd);
+                                }
+                            }
+                            if (player.movementTrustFactor == PlayerTrustFactor.YELLOW) {
+                                for (Player bukkitPlayer : GrimAPI.INSTANCE.getAlertManager().getEnabledAlerts()) {
+                                    String alertString = "&4[Acidity]: &f%player% failed %check_name% [" + "&gYELLOW" + "&f] &f(x&c%vl%&f) &7%verbose%";
+                                    String cmd = replaceAlertPlaceholders(command.getCommand(), group, check, alertString, verbose);
+
+                                    bukkitPlayer.sendMessage(cmd);
+                                }
+                            }
+                            if (player.movementTrustFactor == PlayerTrustFactor.ORANGE) {
+                                for (Player bukkitPlayer : GrimAPI.INSTANCE.getAlertManager().getEnabledAlerts()) {
+                                    String alertString = "&4[Acidity]: &f%player% failed %check_name% [" + "&6ORANGE" + "&f] &f(x&c%vl%&f) &7%verbose%";
+                                    String cmd = replaceAlertPlaceholders(command.getCommand(), group, check, alertString, verbose);
+
+                                    bukkitPlayer.sendMessage(cmd);
+                                }
+                            }
+                            if (player.movementTrustFactor == PlayerTrustFactor.RED) {
+                                for (Player bukkitPlayer : GrimAPI.INSTANCE.getAlertManager().getEnabledAlerts()) {
+                                    String alertString = "&4[Acidity]: &f%player% failed %check_name% [" + "&4RED" + "&f] &f(x&c%vl%&f) &7%verbose%";
+                                    String cmd = replaceAlertPlaceholders(command.getCommand(), group, check, alertString, verbose);
+
+                                    bukkitPlayer.sendMessage(cmd);
+                                }
+                            }
+                        }
+                        else {
+                            for (Player bukkitPlayer : GrimAPI.INSTANCE.getAlertManager().getEnabledAlerts()) {
+                                String alertString = "&4[Acidity]: &f%player% failed %check_name% [" + "N/A" + "] &f(x&c%vl%&f) &7%verbose%";
+                                String cmd = replaceAlertPlaceholders(command.getCommand(), group, check, alertString, verbose);
+
+                                bukkitPlayer.sendMessage(cmd);
+                            }
                         }
                     }
-
+                    /*
                     if (violationCount >= command.getThreshold()) {
                         // 0 means execute once
                         // Any other number means execute every X interval
@@ -168,6 +239,7 @@ public class PunishmentManager {
 
                         command.setExecuteCount(command.getExecuteCount() + 1);
                     }
+                    */
                 }
             }
         }

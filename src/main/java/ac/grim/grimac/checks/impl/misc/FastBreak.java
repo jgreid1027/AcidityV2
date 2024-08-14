@@ -29,7 +29,7 @@ import org.bukkit.entity.Player;
 // Based loosely off of Hawk BlockBreakSpeedSurvival
 // Also based loosely off of NoCheatPlus FastBreak
 // Also based off minecraft wiki: https://minecraft.wiki/w/Breaking#Instant_breaking
-@CheckData(name = "FastBreak", experimental = false)
+@CheckData(name = "FastBreak (A)", configName = "FastBreak")
 public class FastBreak extends Check implements PacketCheck {
     public FastBreak(GrimPlayer playerData) {
         super(playerData);

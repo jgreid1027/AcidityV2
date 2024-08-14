@@ -1,5 +1,7 @@
 package ac.grim.grimac.checks;
 
+import ac.grim.grimac.mitigation.TrustFactorCheckType;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -15,6 +17,9 @@ public @interface CheckData {
     String configName() default "DEFAULT";
 
     String description() default "No description provided";
+
+    TrustFactorCheckType checkTypeTrustFactor() default TrustFactorCheckType.MISC;
+    int changeTrustFactor() default 5;
 
     double decay() default 0.05;
 

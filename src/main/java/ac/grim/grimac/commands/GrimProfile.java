@@ -1,12 +1,9 @@
 package ac.grim.grimac.commands;
 
 import ac.grim.grimac.GrimAPI;
-import ac.grim.grimac.checks.impl.aim.processor.AimProcessor;
-import ac.grim.grimac.checks.impl.misc.ClientBrand;
 import ac.grim.grimac.player.GrimPlayer;
 import ac.grim.grimac.utils.anticheat.MessageUtil;
 import ac.grim.grimac.utils.anticheat.MultiLibUtil;
-import ac.grim.grimac.utils.math.GrimMath;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;

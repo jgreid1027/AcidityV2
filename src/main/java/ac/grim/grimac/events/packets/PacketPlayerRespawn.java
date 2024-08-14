@@ -1,8 +1,8 @@
 package ac.grim.grimac.events.packets;
 
 import ac.grim.grimac.GrimAPI;
-import ac.grim.grimac.checks.impl.badpackets.BadPacketsE;
-import ac.grim.grimac.checks.impl.badpackets.BadPacketsF;
+import ac.grim.grimac.checks.impl.packet.badpackets.BadPacketsE;
+import ac.grim.grimac.checks.impl.packet.badpackets.BadPacketsF;
 import ac.grim.grimac.player.GrimPlayer;
 import ac.grim.grimac.utils.data.TrackerData;
 import ac.grim.grimac.utils.data.packetentity.PacketEntitySelf;

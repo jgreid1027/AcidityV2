@@ -3,13 +3,14 @@ package ac.grim.grimac.checks.impl.movement;
 import ac.grim.grimac.checks.Check;
 import ac.grim.grimac.checks.CheckData;
 import ac.grim.grimac.checks.type.PacketCheck;
+import ac.grim.grimac.mitigation.TrustFactorCheckType;
 import ac.grim.grimac.player.GrimPlayer;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerFlying;
 
-@CheckData(name = "Timer", configName = "TimerA", setback = 10)
+@CheckData(name = "Timer (A1)", configName = "TimerA", setback = 10, checkTypeTrustFactor = TrustFactorCheckType.MOVEMENT, changeTrustFactor = 5)
 public class TimerCheck extends Check implements PacketCheck {
     long timerBalanceRealTime = 0;
 

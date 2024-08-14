@@ -2,29 +2,28 @@ package ac.grim.grimac.manager;
 
 
 import ac.grim.grimac.api.AbstractCheck;
-import ac.grim.grimac.checks.impl.aim.AimDuplicateLook;
-import ac.grim.grimac.checks.impl.aim.AimModulo360;
-import ac.grim.grimac.checks.impl.aim.processor.AimProcessor;
-import ac.grim.grimac.checks.impl.badpackets.*;
-import ac.grim.grimac.checks.impl.baritone.Baritone;
-import ac.grim.grimac.checks.impl.combat.Reach;
-import ac.grim.grimac.checks.impl.crash.*;
-import ac.grim.grimac.checks.impl.exploit.ExploitA;
-import ac.grim.grimac.checks.impl.exploit.ExploitB;
-import ac.grim.grimac.checks.impl.groundspoof.NoFallA;
+import ac.grim.grimac.checks.impl.combat.aim.*;
+import ac.grim.grimac.checks.impl.combat.aim.processor.AimProcessor;
+import ac.grim.grimac.checks.impl.packet.badpackets.*;
+import ac.grim.grimac.checks.impl.misc.baritone.Baritone;
+import ac.grim.grimac.checks.impl.combat.reach.Reach;
+import ac.grim.grimac.checks.impl.misc.crash.*;
+import ac.grim.grimac.checks.impl.misc.exploit.ExploitA;
+import ac.grim.grimac.checks.impl.misc.exploit.ExploitB;
+import ac.grim.grimac.checks.impl.misc.groundspoof.NoFallA;
 import ac.grim.grimac.checks.impl.misc.ClientBrand;
 import ac.grim.grimac.checks.impl.misc.FastBreak;
 import ac.grim.grimac.checks.impl.misc.GhostBlockMitigation;
-import ac.grim.grimac.checks.impl.misc.TransactionOrder;
+import ac.grim.grimac.checks.impl.packet.TransactionOrder;
 import ac.grim.grimac.checks.impl.movement.*;
-import ac.grim.grimac.checks.impl.post.PostCheck;
-import ac.grim.grimac.checks.impl.prediction.DebugHandler;
-import ac.grim.grimac.checks.impl.prediction.NoFallB;
-import ac.grim.grimac.checks.impl.prediction.OffsetHandler;
-import ac.grim.grimac.checks.impl.prediction.Phase;
-import ac.grim.grimac.checks.impl.scaffolding.*;
-import ac.grim.grimac.checks.impl.velocity.ExplosionHandler;
-import ac.grim.grimac.checks.impl.velocity.KnockbackHandler;
+import ac.grim.grimac.checks.impl.packet.post.PostCheck;
+import ac.grim.grimac.checks.impl.movement.prediction.DebugHandler;
+import ac.grim.grimac.checks.impl.movement.prediction.NoFallB;
+import ac.grim.grimac.checks.impl.movement.prediction.OffsetHandler;
+import ac.grim.grimac.checks.impl.movement.prediction.Phase;
+import ac.grim.grimac.checks.impl.scaffold.*;
+import ac.grim.grimac.checks.impl.combat.velocity.ExplosionHandler;
+import ac.grim.grimac.checks.impl.combat.velocity.KnockbackHandler;
 import ac.grim.grimac.checks.type.*;
 import ac.grim.grimac.events.packets.PacketChangeGameState;
 import ac.grim.grimac.events.packets.PacketEntityReplication;
@@ -59,6 +58,7 @@ public class CheckManager {
     public CheckManager(GrimPlayer player) {
         // Include post checks in the packet check too
         packetChecks = new ImmutableClassToInstanceMap.Builder<PacketCheck>()
+                .put(AimDHelper.class, new AimDHelper(player))
                 .put(Reach.class, new Reach(player))
                 .put(PacketEntityReplication.class, new PacketEntityReplication(player))
                 .put(PacketChangeGameState.class, new PacketChangeGameState(player))
@@ -108,6 +108,8 @@ public class CheckManager {
                 .put(AimProcessor.class, new AimProcessor(player))
                 .put(AimModulo360.class, new AimModulo360(player))
                 .put(AimDuplicateLook.class, new AimDuplicateLook(player))
+                .put(AimA.class, new AimA(player))
+                .put(AimD.class, new AimD(player))
                 .put(Baritone.class, new Baritone(player))
                 .build();
         vehicleCheck = new ImmutableClassToInstanceMap.Builder<VehicleCheck>()
@@ -115,6 +117,7 @@ public class CheckManager {
                 .build();
 
         postPredictionCheck = new ImmutableClassToInstanceMap.Builder<PostPredictionCheck>()
+                .put(MovementMitigationHelper.class, new MovementMitigationHelper(player))
                 .put(NegativeTimerCheck.class, new NegativeTimerCheck(player))
                 .put(ExplosionHandler.class, new ExplosionHandler(player))
                 .put(KnockbackHandler.class, new KnockbackHandler(player))

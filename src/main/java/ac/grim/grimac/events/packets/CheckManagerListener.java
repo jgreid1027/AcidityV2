@@ -1,8 +1,8 @@
 package ac.grim.grimac.events.packets;
 
 import ac.grim.grimac.GrimAPI;
-import ac.grim.grimac.checks.impl.badpackets.BadPacketsX;
-import ac.grim.grimac.checks.impl.badpackets.BadPacketsZ;
+import ac.grim.grimac.checks.impl.packet.badpackets.BadPacketsX;
+import ac.grim.grimac.checks.impl.packet.badpackets.BadPacketsZ;
 import ac.grim.grimac.events.packets.patch.ResyncWorldUtil;
 import ac.grim.grimac.player.GrimPlayer;
 import ac.grim.grimac.utils.anticheat.update.*;

@@ -3,6 +3,8 @@ package ac.grim.grimac.checks;
 import ac.grim.grimac.GrimAPI;
 import ac.grim.grimac.api.AbstractCheck;
 import ac.grim.grimac.api.events.FlagEvent;
+import ac.grim.grimac.mitigation.PlayerTrustFactor;
+import ac.grim.grimac.mitigation.TrustFactorCheckType;
 import ac.grim.grimac.player.GrimPlayer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
@@ -25,6 +27,9 @@ public class Check implements AbstractCheck {
     private String alternativeName;
     private String description;
 
+    private int trustFactorChange;
+    private TrustFactorCheckType trustFactorType;
+
     private boolean experimental;
     @Setter
     private boolean isEnabled;
@@ -43,6 +48,10 @@ public class Check implements AbstractCheck {
             final CheckData checkData = checkClass.getAnnotation(CheckData.class);
             this.checkName = checkData.name();
             this.configName = checkData.configName();
+
+            trustFactorChange = checkData.changeTrustFactor();
+            trustFactorType = checkData.checkTypeTrustFactor();
+
             // Fall back to check name
             if (this.configName.equals("DEFAULT")) this.configName = this.checkName;
             this.decay = checkData.decay();
@@ -79,10 +88,11 @@ public class Check implements AbstractCheck {
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) return false;
 
-
         player.punishmentManager.handleViolation(this);
 
         violations++;
+
+        GrimAPI.INSTANCE.getMitigationHandler().handleFlag(player, this);
         return true;
     }
 

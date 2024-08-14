@@ -2,6 +2,7 @@ package ac.grim.grimac;
 
 import ac.grim.grimac.api.GrimAbstractAPI;
 import ac.grim.grimac.manager.*;
+import ac.grim.grimac.mitigation.MitigationHandler;
 import ac.grim.grimac.utils.anticheat.PlayerDataManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -12,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public enum GrimAPI {
     INSTANCE;
 
+    private final MitigationHandler mitigationHandler = new MitigationHandler();
     private final AlertManager alertManager = new AlertManager();
     private final SpectateManager spectateManager = new SpectateManager();
     private final DiscordManager discordManager = new DiscordManager();

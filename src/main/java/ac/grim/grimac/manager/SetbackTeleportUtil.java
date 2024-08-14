@@ -2,7 +2,7 @@ package ac.grim.grimac.manager;
 
 import ac.grim.grimac.GrimAPI;
 import ac.grim.grimac.checks.Check;
-import ac.grim.grimac.checks.impl.badpackets.BadPacketsN;
+import ac.grim.grimac.checks.impl.packet.badpackets.BadPacketsN;
 import ac.grim.grimac.checks.type.PostPredictionCheck;
 import ac.grim.grimac.events.packets.patch.ResyncWorldUtil;
 import ac.grim.grimac.player.GrimPlayer;
@@ -104,6 +104,12 @@ public class SetbackTeleportUtil extends Check implements PostPredictionCheck {
         return true;
     }
 
+    public boolean executeViolationSetback2() {
+        if (isExempt()) return false;
+        blockMovementsUntilResync2(true, false);
+        return true;
+    }
+
     private boolean isExempt() {
         // Not exempting spectators here because timer check for spectators is actually valid.
         // Player hasn't spawned yet
@@ -194,6 +200,75 @@ public class SetbackTeleportUtil extends Check implements PostPredictionCheck {
         }
 
         SetBackData data = new SetBackData(new TeleportData(position, new RelativeFlag(0b11000), player.lastTransactionSent.get(), 0), player.xRot, player.yRot, clientVel, player.compensatedEntities.getSelf().getRiding() != null, false);
+        sendSetback(data);
+    }
+
+    private void blockMovementsUntilResync2(boolean simulateNextTickPosition, boolean isResync) {
+        if (requiredSetBack == null) return; // Hasn't spawned
+        if (player.bukkitPlayer != null && player.noSetbackPermission) return; // The player has permission to cheat
+        requiredSetBack.setPlugin(false); // The player has illegal movement, block from vanilla ac override
+        if (isPendingSetback()) return; // Don't spam setbacks
+
+        // Only let us full resync once every five seconds to prevent unneeded bukkit load
+        if (System.currentTimeMillis() - lastWorldResync > 5 * 1000) {
+            ResyncWorldUtil.resyncPositions(player, player.boundingBox.copy().expand(1));
+            lastWorldResync = System.currentTimeMillis();
+        }
+
+        Vector clientVel = lastKnownGoodPosition.vector.clone();
+
+        Pair<VelocityData, Vector> futureKb = player.checkManager.getKnockbackHandler().getFutureKnockback();
+        VelocityData futureExplosion = player.checkManager.getExplosionHandler().getFutureExplosion();
+
+        // Velocity sets
+        if (futureKb.getFirst() != null) {
+            clientVel = futureKb.getSecond();
+        }
+
+        // Explosion adds
+        if (futureExplosion != null && (futureKb.getFirst() == null || futureKb.getFirst().transaction < futureExplosion.transaction)) {
+            clientVel.add(futureExplosion.vector);
+        }
+
+        Vector3d position = lastKnownGoodPosition.pos;
+
+        SimpleCollisionBox oldBB = player.boundingBox;
+        player.boundingBox = GetBoundingBox.getPlayerBoundingBox(player, position.getX(), position.getY(), position.getZ());
+
+        // Mini prediction engine - simulate collisions
+        if (simulateNextTickPosition) {
+            Vector collide = Collisions.collide(player, clientVel.getX(), clientVel.getY(), clientVel.getZ());
+
+            position = position.withX(position.getX() + collide.getX());
+            // 1.8 players need the collision epsilon to not phase into blocks when being setback
+            // Due to simulation, this will not allow a flight bypass by sending a billion invalid movements
+            position = position.withY(position.getY() + collide.getY() + SimpleCollisionBox.COLLISION_EPSILON);
+            position = position.withZ(position.getZ() + collide.getZ());
+
+            if (clientVel.getX() != collide.getX()) clientVel.setX(0);
+            if (clientVel.getY() != collide.getY()) clientVel.setY(0);
+            if (clientVel.getZ() != collide.getZ()) clientVel.setZ(0);
+
+            simulateFriction(clientVel);
+        }
+
+        player.boundingBox = oldBB; // reset back to the new bounding box
+
+        if (!hasAcceptedSpawnTeleport || player.isFlying) clientVel = null; // if the player is flying or hasn't spawned... don't force kb
+
+        // Something weird has occurred in the player's movement, block offsets until we resync
+        if (isResync) {
+            blockOffsets = true;
+        }
+
+        if (!player.movementMitigationSetXZPosition) {
+            player.movementMitigationSetXZPosition = true;
+            player.movementMitigationPosition = position;
+        }
+
+        Vector3d newPosition = new Vector3d(player.movementMitigationPosition.getX(), position.getY(), player.movementMitigationPosition.getZ());
+
+        SetBackData data = new SetBackData(new TeleportData(newPosition, new RelativeFlag(0b11000), player.lastTransactionSent.get(), 0), player.xRot, player.yRot, clientVel, player.compensatedEntities.getSelf().getRiding() != null, false);
         sendSetback(data);
     }
 

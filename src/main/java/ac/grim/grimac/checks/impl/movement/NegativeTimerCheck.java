@@ -2,11 +2,12 @@ package ac.grim.grimac.checks.impl.movement;
 
 import ac.grim.grimac.checks.CheckData;
 import ac.grim.grimac.checks.type.PostPredictionCheck;
+import ac.grim.grimac.mitigation.TrustFactorCheckType;
 import ac.grim.grimac.player.GrimPlayer;
 import ac.grim.grimac.utils.anticheat.update.PredictionComplete;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 
-@CheckData(name = "NegativeTimer", configName = "NegativeTimer", setback = 10, experimental = true)
+@CheckData(name = "Timer (B)", configName = "NegativeTimer", setback = 10, experimental = true, checkTypeTrustFactor = TrustFactorCheckType.MOVEMENT, changeTrustFactor = 3)
 public class NegativeTimerCheck extends TimerCheck implements PostPredictionCheck {
 
     public NegativeTimerCheck(GrimPlayer player) {

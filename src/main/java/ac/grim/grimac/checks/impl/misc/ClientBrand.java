@@ -2,7 +2,7 @@ package ac.grim.grimac.checks.impl.misc;
 
 import ac.grim.grimac.GrimAPI;
 import ac.grim.grimac.checks.Check;
-import ac.grim.grimac.checks.impl.exploit.ExploitA;
+import ac.grim.grimac.checks.impl.misc.exploit.ExploitA;
 import ac.grim.grimac.checks.type.PacketCheck;
 import ac.grim.grimac.player.GrimPlayer;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;

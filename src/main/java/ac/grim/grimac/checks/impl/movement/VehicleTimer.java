@@ -1,11 +1,12 @@
 package ac.grim.grimac.checks.impl.movement;
 
 import ac.grim.grimac.checks.CheckData;
+import ac.grim.grimac.mitigation.TrustFactorCheckType;
 import ac.grim.grimac.player.GrimPlayer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 
-@CheckData(name = "Timer - Vehicle", configName = "TimerVehicle", setback = 10)
+@CheckData(name = "Timer (A2)", configName = "TimerVehicle", setback = 10, checkTypeTrustFactor = TrustFactorCheckType.MOVEMENT, changeTrustFactor = 5)
 public class VehicleTimer extends TimerCheck {
     boolean isDummy = false;
 

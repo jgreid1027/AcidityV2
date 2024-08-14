@@ -3,11 +3,14 @@ package ac.grim.grimac.player;
 import ac.grim.grimac.GrimAPI;
 import ac.grim.grimac.api.AbstractCheck;
 import ac.grim.grimac.api.GrimUser;
-import ac.grim.grimac.checks.impl.aim.processor.AimProcessor;
+import ac.grim.grimac.checks.impl.combat.aim.processor.AimProcessor;
 import ac.grim.grimac.checks.impl.misc.ClientBrand;
-import ac.grim.grimac.checks.impl.misc.TransactionOrder;
+import ac.grim.grimac.checks.impl.packet.TransactionOrder;
 import ac.grim.grimac.events.packets.CheckManagerListener;
 import ac.grim.grimac.manager.*;
+import ac.grim.grimac.mitigation.PlayerTrustFactor;
+import ac.grim.grimac.mitigation.types.CombatMitigationType;
+import ac.grim.grimac.mitigation.types.MovementMitigationType;
 import ac.grim.grimac.predictionengine.MovementCheckRunner;
 import ac.grim.grimac.predictionengine.PointThreeEstimator;
 import ac.grim.grimac.predictionengine.UncertaintyHandler;
@@ -34,7 +37,6 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.world.BlockFace;
-import com.github.retrooper.packetevents.protocol.world.Dimension;
 import com.github.retrooper.packetevents.protocol.world.dimension.DimensionType;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
@@ -71,6 +73,91 @@ public class GrimPlayer implements GrimUser {
     public int entityID;
     @Nullable
     public Player bukkitPlayer;
+
+    // Trust Factor Data
+    public PlayerTrustFactor combatTrustFactor = PlayerTrustFactor.GREEN; // Combat checks don't false much, so trust factor lowers faster
+    public PlayerTrustFactor movementTrustFactor = PlayerTrustFactor.GREEN; // Simulation can false quite a bit, so this doesn't lower people's trust factor as much
+    public PlayerTrustFactor packetTrustFactor = PlayerTrustFactor.GREEN; // Goes down pretty fast considering people don't fail BadPackets as often
+    public PlayerTrustFactor scaffoldTrustFactor = PlayerTrustFactor.GREEN; // Scaffold checks don't false much, so trust factor lowers faster
+    public PlayerTrustFactor miscTrustFactor = PlayerTrustFactor.GREEN; // Honestly, I don't know what checks are going to go in here, so I will make it lower trust factor slower
+
+
+    // Trust Factor Weights
+    // This essentially holds data on how fast a player's trust factor can go back up to green and vice versa.
+    // 0 is the highest trust you can get
+    public int combatCurrentWeight = 0;
+    public int movementCurrentWeight = 0;
+    public int packetCurrentWeight = 0;
+    public int scaffoldCurrentWeight = 0;
+
+    public int greenTrustFactorMinCombat = 0;
+    public int greenTrustFactorMaxCombat = 5;
+    public int yellowTrustFactorMinCombat = 5;
+    public int yellowTrustFactorMaxCombat = 15;
+    public int orangeTrustFactorMinCombat = 15;
+    public int orangeTrustFactorMaxCombat = 30;
+    public int redTrustFactorMinCombat = 30;
+    public int redTrustFactorMaxCombat = Integer.MAX_VALUE; // I bet you that no one will reach integer limit
+
+    public int greenTrustFactorMinMovement = 0;
+    public int greenTrustFactorMaxMovement = 15;
+    public int yellowTrustFactorMinMovement = 15;
+    public int yellowTrustFactorMaxMovement = 30;
+    public int orangeTrustFactorMinMovement = 30;
+    public int orangeTrustFactorMaxMovement = 50;
+    public int redTrustFactorMinMovement = 50;
+    public int redTrustFactorMaxMovement = Integer.MAX_VALUE; // I bet you that no one will reach integer limit
+
+    public int greenTrustFactorMinPacket = 0;
+    public int greenTrustFactorMaxPacket = 2;
+    public int yellowTrustFactorMinPacket = 2;
+    public int yellowTrustFactorMaxPacket = 5;
+    public int orangeTrustFactorMinPacket = 5;
+    public int orangeTrustFactorMaxPacket = 7;
+    public int redTrustFactorMinPacket = 7;
+    public int redTrustFactorMaxPacket = Integer.MAX_VALUE; // I bet you that no one will reach integer limit
+
+    public int greenTrustFactorMinScaffold = 0;
+    public int greenTrustFactorMaxScaffold = 5;
+    public int yellowTrustFactorMinScaffold = 5;
+    public int yellowTrustFactorMaxScaffold = 15;
+    public int orangeTrustFactorMinScaffold = 15;
+    public int orangeTrustFactorMaxScaffold = 30;
+    public int redTrustFactorMinScaffold = 30;
+    public int redTrustFactorMaxScaffold = Integer.MAX_VALUE; // I bet you that no one will reach integer limit
+
+    public int greenTrustFactorMinMisc = 0;
+    public int greenTrustFactorMaxMisc = 10;
+    public int yellowTrustFactorMinMisc = 10;
+    public int yellowTrustFactorMaxMisc = 20;
+    public int orangeTrustFactorMinMisc = 20;
+    public int orangeTrustFactorMaxMisc = 30;
+    public int redTrustFactorMinMisc = 30;
+    public int redTrustFactorMaxMisc = Integer.MAX_VALUE; // I bet you that no one will reach integer limit
+
+    // Mitigation Data (Combat)
+    public int timesToMitigateCombat = 0;
+    public CombatMitigationType combatMitigationType = CombatMitigationType.NONE;
+
+    // Mitigation Data (Movement)
+    public int timesToMitigateMovement = 0;
+    public MovementMitigationType movementMitigationType = MovementMitigationType.TP_FROM;
+    public boolean movementMitigationIsOnGround = false;
+    public boolean movementMitigationSetXZPosition = false;
+    public Vector3d movementMitigationPosition = new Vector3d();
+
+
+    // Aim Check A
+    public float currentDeltaX = -1.0f;
+    public float currentDeltaY = -1.0f;
+
+    public float previousDeltaX = -1.0f;
+    public float previousDeltaY = -1.0f;
+
+    // Aim Check D
+    public boolean snappedAimFlag = false;
+    public boolean snapHitAimFlag = false;
+
     // Start transaction handling stuff
     // Determining player ping
     // The difference between keepalive and transactions is that keepalive is async while transactions are sync
