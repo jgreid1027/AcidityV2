@@ -12,7 +12,7 @@ import org.bukkit.Bukkit;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-@CheckData(name = "Movement Prediction (A)", configName = "Simulation", decay = 0.02, checkTypeTrustFactor = TrustFactorCheckType.MOVEMENT, changeTrustFactor = 2)
+@CheckData(name = "Simulation", configName = "Simulation", decay = 0.02, checkTypeTrustFactor = TrustFactorCheckType.MOVEMENT, changeTrustFactor = 2)
 public class OffsetHandler extends Check implements PostPredictionCheck {
     // Config
     double setbackDecayMultiplier;
