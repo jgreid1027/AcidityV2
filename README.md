@@ -10,6 +10,7 @@ Acidity (V2) is an advanced anti-cheat solution for Minecraft. Similar to the pr
 ## Notice(s)
 - ACIDITY IS A WORK IN PROGRESS PROJECT. Don't expect everything to be finished for quite a while.
 
+- It is recommended that your server staff enable verbose (/grim verbose).
 
 ## License (What you can do with this source code and vice versa)
 ### Here are some of the main points made in the GPL v3.0 license:
@@ -44,3 +45,12 @@ Similar to paid anticheats like Polar or Intave, Acidity mitigates cheaters to p
 ### Trust Factor
 Acidity uses something called "Trust Factor" to determine if a person is cheating. If a player flags a lot for one or more checks enough and are flagged a certain way, they get a lower trust factor. When someone has a lower trust factor, they are more likely to be mitigated and more likely to alert staff whenever they flag. It is also based on the severity of the player's flags.
 
+## TODO List
+### If you would like to contribute, open an issue or pull request!
+- Add mitigations for Backtrack (Grim Contributors straight up won't do it...)
+
+- Include "severity" values in flags, which will be used for trust factor and mitigations
+
+- Add and improve combat checks (Auto Clicker, Aim Assist, Auto Block, Kill Aura, etc.)
+  
+- Improve Scaffold detections (yes, let's also add more checks for the fun of it)
