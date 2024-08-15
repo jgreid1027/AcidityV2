@@ -41,7 +41,7 @@ public class OffsetHandler extends Check implements PostPredictionCheck {
         if (completePredictionEvent.isCancelled()) return;
 
         // Short circuit out flag call
-        if ((offset >= threshold || offset >= immediateSetbackThreshold) && flagAndAlert()) {
+        if ((offset >= threshold || offset >= immediateSetbackThreshold)) {
             advantageGained += offset;
 
             boolean isSetback = advantageGained >= maxAdvantage || offset >= immediateSetbackThreshold;
@@ -49,6 +49,7 @@ public class OffsetHandler extends Check implements PostPredictionCheck {
 
             if (isSetback) {
                 player.getSetbackTeleportUtil().executeViolationSetback();
+                flagAndAlert(); // let's move it here and see what happens :D
             }
 
             violations++;
