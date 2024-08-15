@@ -83,6 +83,8 @@ public class Check implements AbstractCheck {
     public final boolean flag() {
         if (player.disableGrim || (experimental && !GrimAPI.INSTANCE.getConfigManager().isExperimentalChecks()))
             return false; // Avoid calling event if disabled
+        
+        GrimAPI.INSTANCE.getMitigationHandler().handleFlag(player, this);
 
         FlagEvent event = new FlagEvent(player, this);
         Bukkit.getPluginManager().callEvent(event);
@@ -91,8 +93,6 @@ public class Check implements AbstractCheck {
         player.punishmentManager.handleViolation(this);
 
         violations++;
-
-        GrimAPI.INSTANCE.getMitigationHandler().handleFlag(player, this);
         return true;
     }
 
